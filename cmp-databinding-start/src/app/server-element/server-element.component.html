@@ -1,0 +1,6 @@
+<div class="panel panel-default" *ngFor="let element of serverElements">
+  <div class="panel-heading">{{ element.serverName }}</div>
+  <div class="panel-body">
+    <ng-content></ng-content>
+  </div>
+</div>
