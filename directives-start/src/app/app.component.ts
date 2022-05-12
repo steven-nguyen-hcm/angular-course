@@ -10,6 +10,5 @@ export class AppComponent {
   onlyOdd = false;
   oddNumbers = this.numbers.filter((num) => num % 2 === 1);
   evenNumbers = this.numbers.filter((num) => num % 2 === 0);
-
- 
+  value: number = 10;
 }

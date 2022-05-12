@@ -6,11 +6,13 @@
       </button>
       <br /><br />
       <ul class="list-group">
-        <li class="list-group-item" *ngIf="onlyOdd">
+        <li class="list-group-item" *appUnless="!onlyOdd; let temp">
           <p *ngFor="let number of oddNumbers">{{ number }}</p>
+          <h1>{{temp}}</h1>
         </li>
-        <li class="list-group-item" *ngIf="!onlyOdd">
+        <li class="list-group-item" *appUnless="onlyOdd; let temp">
           <p *ngFor="let number of evenNumbers">{{ number }}</p>
+          <h2>{{temp}}</h2>
         </li>
       </ul>
       <div *ngIf="onlyOdd">
@@ -21,3 +23,10 @@
 </div>
 <p appBasicHighlight="red">Try to highlight me!!</p>
 <p appBetterHighlight>Try to highlight me!!</p>
+
+<div [ngSwitch]="value">
+  <div *ngSwitchCase="5">Value is 5</div>
+  <div *ngSwitchCase="10">Value is 10</div>
+  <div *ngSwitchCase="15">Value is 15</div>
+  <div *ngSwitchCase="20">Value is 20</div>
+</div>
