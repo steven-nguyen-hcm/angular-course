@@ -1,0 +1,10 @@
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-md-8 col-md-offset-2">
+      <app-active-users [users]="userService.activeUsers"></app-active-users>
+      <app-inactive-users
+        [users]="userService.inactiveUsers"
+      ></app-inactive-users>
+    </div>
+  </div>
+</div>
