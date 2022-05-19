@@ -1,10 +1,9 @@
 <div class="row">
-  <button class="btn btn-default" (click)="onReload()">Reload</button>
   <div class="col-xs-12 col-sm-4">
     <div class="list-group">
       <a
         [routerLink]="['/servers', server.id]"
-        [queryParams]="{ allowEdit: 1 }"
+        [queryParams]="{ allowEdit: server.allowEdit ? 1 : 0 }"
         fragment="loading"
         class="list-group-item"
         *ngFor="let server of servers"

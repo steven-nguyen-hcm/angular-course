@@ -13,7 +13,8 @@ export class ServersService {
     {
       id: 3,
       name: 'Devserver',
-      status: 'offline'
+      status: 'offline',
+      allowEdit: true
     }
   ];
 
