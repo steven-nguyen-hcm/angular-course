@@ -7,8 +7,6 @@ export interface ICanDeactivateComponent {
 
 export class CanDeactivateGuard implements CanDeactivate<ICanDeactivateComponent> {
   canDeactivate(component: ICanDeactivateComponent, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState?: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
-    console.log(currentState);
-    
     return component.canDeactivate();
   }
 }
