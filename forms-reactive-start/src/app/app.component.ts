@@ -15,6 +15,7 @@ import {
 export class AppComponent implements OnInit {
   genders = ["male", "female"];
   signupForm: FormGroup;
+  forbiddenNames = ["steven", "admin"];
 
   constructor(private fb: FormBuilder) {}
 
@@ -36,22 +37,28 @@ export class AppComponent implements OnInit {
   }
 
   private initFormGroup() {
-    this.signupForm = this.fb.group({
-      userData: this.fb.group({
-        username: this.fb.control(null, Validators.required),
-        email: this.fb.control(null, [Validators.required, Validators.email]),
+    this.signupForm = new FormGroup({
+      userData: new FormGroup({
+        username: new FormControl(null, [
+          Validators.required,
+          (control: FormControl): { [key: string]: boolean } => {
+            if (this.forbiddenNames.indexOf(control.value) !== -1) {
+              return { nameIsForbidden: true };
+            }
+            return null;
+          },
+        ]),
+        email: new FormControl(null, [Validators.required, Validators.email]),
       }),
-      gender: this.fb.control("male", Validators.required),
-      hobbies: this.fb.array([]),
+      gender: new FormControl("male", Validators.required),
+      hobbies: new FormArray([]),
     });
+  }
 
-    // this.signupForm = new FormGroup({
-    //   userData: new FormGroup({
-    //     username: new FormControl(null, Validators.required),
-    //     email: new FormControl(null, [Validators.required, Validators.email]),
-    //   }),
-    //   gender: new FormControl("male", Validators.required),
-    //   hobbies: new FormArray([]),
-    // });
+  forbiddenNamesValidator(control: FormControl): { [s: string]: boolean } {
+    if (this.forbiddenNames.indexOf(control.value) !== -1) {
+      return { nameIsForbidden: true };
+    }
+    return null;
   }
 }
