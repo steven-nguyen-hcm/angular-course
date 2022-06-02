@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import {
   FormArray,
   FormBuilder,
@@ -6,7 +6,7 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { CustomValidatorInterface } from "./custom-validator.interface";
 
 @Component({
@@ -14,10 +14,11 @@ import { CustomValidatorInterface } from "./custom-validator.interface";
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   genders = ["male", "female"];
   signupForm: FormGroup;
   forbiddenNames = ["steven", "admin"];
+  private formStatusChangeSubscription: Subscription;
 
   constructor(private fb: FormBuilder) {}
 
@@ -27,6 +28,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.initFormGroup();
+    this.registerFormStatusSubscription();
   }
 
   onSubmit() {
@@ -56,6 +58,12 @@ export class AppComponent implements OnInit {
     });
   }
 
+  private registerFormStatusSubscription() {
+    this.formStatusChangeSubscription = this.signupForm.statusChanges.subscribe(
+      (status: string) => console.log(status)
+    );
+  }
+
   private forbiddenNamesValidator = (
     control: FormControl
   ): CustomValidatorInterface => {
@@ -67,9 +75,7 @@ export class AppComponent implements OnInit {
 
   private forbiddenEmailValidator(
     control: FormControl
-  ):
-    | Promise<CustomValidatorInterface>
-    | Observable<CustomValidatorInterface> {
+  ): Promise<CustomValidatorInterface> | Observable<CustomValidatorInterface> {
     const promise = new Promise<CustomValidatorInterface>((resolve, reject) => {
       setTimeout(() => {
         if (control.value === "admin@test.com") {
@@ -81,5 +87,9 @@ export class AppComponent implements OnInit {
     });
 
     return promise;
-  };
+  }
+
+  ngOnDestroy(): void {
+    this.formStatusChangeSubscription.unsubscribe();
+  }
 }
