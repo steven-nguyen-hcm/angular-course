@@ -6,6 +6,8 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
+import { Observable } from "rxjs";
+import { CustomValidatorInterface } from "./custom-validator.interface";
 
 @Component({
   selector: "app-root",
@@ -41,24 +43,43 @@ export class AppComponent implements OnInit {
       userData: new FormGroup({
         username: new FormControl(null, [
           Validators.required,
-          (control: FormControl): { [key: string]: boolean } => {
-            if (this.forbiddenNames.indexOf(control.value) !== -1) {
-              return { nameIsForbidden: true };
-            }
-            return null;
-          },
+          this.forbiddenNamesValidator,
         ]),
-        email: new FormControl(null, [Validators.required, Validators.email]),
+        email: new FormControl(
+          null,
+          [Validators.required, Validators.email],
+          this.forbiddenEmailValidator
+        ),
       }),
       gender: new FormControl("male", Validators.required),
       hobbies: new FormArray([]),
     });
   }
 
-  forbiddenNamesValidator(control: FormControl): { [s: string]: boolean } {
+  private forbiddenNamesValidator = (
+    control: FormControl
+  ): CustomValidatorInterface => {
     if (this.forbiddenNames.indexOf(control.value) !== -1) {
-      return { nameIsForbidden: true };
+      return { forbiddenName: true };
     }
     return null;
-  }
+  };
+
+  private forbiddenEmailValidator(
+    control: FormControl
+  ):
+    | Promise<CustomValidatorInterface>
+    | Observable<CustomValidatorInterface> {
+    const promise = new Promise<CustomValidatorInterface>((resolve, reject) => {
+      setTimeout(() => {
+        if (control.value === "admin@test.com") {
+          resolve({ forbiddenEmail: true });
+        } else {
+          resolve(null);
+        }
+      }, 2500);
+    });
+
+    return promise;
+  };
 }
