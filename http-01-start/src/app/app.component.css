@@ -5,3 +5,7 @@
 .row {
   margin: 20px 0;
 }
+
+textarea {
+  resize: none;
+}

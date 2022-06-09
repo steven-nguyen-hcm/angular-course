@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { map } from "rxjs/operators";
+import { finalize } from "rxjs/operators";
+import { Post } from "./post.model";
+import { PostService } from "./post.service";
 
 @Component({
   selector: "app-root",
@@ -8,57 +9,63 @@ import { map } from "rxjs/operators";
   styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit {
-  loadedPosts = [];
-  apiEndpoint: string =
-    "https://ng-complete-course-177-default-rtdb.asia-southeast1.firebasedatabase.app/";
+  loadedPosts: Post[] = [];
 
-  constructor(private http: HttpClient) {}
+  isFetching: boolean = true;
+
+  error: any;
+
+  constructor(private postService: PostService) {}
 
   ngOnInit() {
     this.fetchPosts();
   }
 
   onCreatePost(postData: { title: string; content: string }) {
-    console.log("asdada");
-
-    // Send Http request
-    this.http.post(this.getRequestUrl("posts.json"), postData).subscribe(
-      (responseData) => {
-        console.log(responseData);
-      },
-      (err) => console.log(err)
-    );
-    console.log(postData);
+    this.isFetching = true;
+    this.postService
+      .createPost(postData)
+      .pipe(finalize(this.onFinishCallback.bind(this)))
+      .subscribe(
+        (responseData) => {
+          console.log(responseData);
+          this.fetchPosts();
+        },
+        (err) => console.log(err)
+      );
   }
 
-  onFetchPosts() {
+  onFetchPosts(): void {
     this.fetchPosts();
   }
 
-  onClearPosts() {
-    // Send Http request
+  onClearPosts(): void {
+    this.postService.deletePosts().subscribe(
+      () => this.fetchPosts(),
+      (err) => console.error(err),
+      this.onFinishCallback.bind(this)
+    );
   }
 
   private fetchPosts(): void {
-    this.http
-      .get(this.getRequestUrl("posts.json"))
-      .pipe(
-        map((responseData) => {
-          const postsArray = [];
-          for (const key in responseData) {
-            if (responseData.hasOwnProperty(key)) {
-              postsArray.push({ ...responseData[key], id: key });
-            }
-          }
-          return postsArray;
-        })
-      )
-      .subscribe((responseData) => {
-        console.log(responseData);
-      });
+    this.isFetching = true;
+    this.postService
+      .fetchPosts()
+      .pipe(finalize(this.onFinishCallback.bind(this)))
+      .subscribe(
+        (postsArray: Post[]) => {
+          this.loadedPosts = postsArray;
+        },
+        this.onErrorCallback.bind(this)
+      );
   }
 
-  private getRequestUrl(path: string): string {
-    return this.apiEndpoint + path;
+  private onFinishCallback() {
+    this.isFetching = false;
+  }
+
+  private onErrorCallback(error) {
+    console.log(error);
+    this.error = error;
   }
 }
