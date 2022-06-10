@@ -1,4 +1,6 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { Post } from "./post.model";
 import { PostService } from "./post.service";
@@ -15,24 +17,22 @@ export class AppComponent implements OnInit {
 
   error: any;
 
+  private _errorSubscription: Subscription;
+
   constructor(private postService: PostService) {}
 
   ngOnInit() {
     this.fetchPosts();
+    this._errorSubscription = this.postService.$error.subscribe(error => {
+      this.error = error;
+    })
   }
 
   onCreatePost(postData: { title: string; content: string }) {
     this.isFetching = true;
     this.postService
       .createPost(postData)
-      .pipe(finalize(this.onFinishCallback.bind(this)))
-      .subscribe(
-        (responseData) => {
-          console.log(responseData);
-          this.fetchPosts();
-        },
-        (err) => console.log(err)
-      );
+      
   }
 
   onFetchPosts(): void {
@@ -66,6 +66,6 @@ export class AppComponent implements OnInit {
 
   private onErrorCallback(error) {
     console.log(error);
-    this.error = error;
+    this.error = error.error;
   }
 }

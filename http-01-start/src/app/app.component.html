@@ -58,11 +58,11 @@
     </ng-template>
     <div class="col-xs-12 col-md-6 col-md-offset-3" *ngIf="!isFetching; else isFetchingTemplate">
       <ng-template #noPosts>
-        <p *ngIf="!error; else fetchError">No posts available!</p>
-        <ng-template #fetchError>
-          <p>{{error.message}}</p>
-        </ng-template>
+        <p>No posts available!</p>
       </ng-template>
+      <div *ngIf="error">
+          <p class="text-danger">{{error.error}}</p>
+      </div>
       <ul class="list-group" *ngIf="loadedPosts.length; else noPosts">
         <li class="list-group-item" *ngFor="let post of loadedPosts">
           <h3>{{ post.title }}</h3>
