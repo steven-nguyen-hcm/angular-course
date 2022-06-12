@@ -62,7 +62,7 @@ export class PostService {
 
   public deletePosts(): Observable<any> {
     return this.http.delete(this.getRequestUrl("posts.json"), {
-      observe: 'body'
+      observe: 'body',
     }).pipe(tap(event => {
       console.log(event);
     }));
