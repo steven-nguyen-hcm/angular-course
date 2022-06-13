@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  apiEndpoint:
+    "https://ng-course-recipe-book-408b7-default-rtdb.asia-southeast1.firebasedatabase.app/",
 };
 
 /*
