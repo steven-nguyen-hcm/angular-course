@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { NgForm } from "@angular/forms";
 
 enum AuthMode {
   "SIGNUP" = "signup",
@@ -10,11 +11,15 @@ enum AuthMode {
   templateUrl: "./auth.component.html",
 })
 export class AuthComponent implements OnInit {
+  @ViewChild("authForm", { static: false }) authForm: NgForm;
   currentAuthMode: AuthMode = AuthMode.SIGNUP;
 
   ngOnInit() {}
 
-  onSubmit() {}
+  onSubmit() {
+    console.log(this.authForm.value);
+    
+  }
 
   toggleAuthMode() {
     if (this.isSignupMode()) {
