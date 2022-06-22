@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component } from "@angular/core";
 import { NgForm } from "@angular/forms";
+import { Observable } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AuthService } from "./auth.service";
 import { AuthResponseData } from "./interfaces/auth-response-data.interface";
@@ -21,18 +22,23 @@ export class AuthComponent {
   }
 
   onSubmit(form: NgForm) {
-    if (form.invalid) {
-      return;
-    }
+    this.errorMessage = null;
 
-    if (this.isLoginMode) {
+    if (form.invalid) {
       return;
     }
 
     this.isLoading = true;
     const { email, password } = form.value;
-    this.authService
-      .signup({ email, password })
+    let authObservable: Observable<AuthResponseData>;
+
+    if (this.isLoginMode) {
+      authObservable = this.authService.signin({ email, password });
+    } else {
+      authObservable = this.authService.signup({ email, password });
+    }
+
+    authObservable
       .pipe(
         finalize(() => {
           this.isLoading = false;
@@ -43,8 +49,8 @@ export class AuthComponent {
           console.log(response);
           form.reset();
         },
-        (error: HttpErrorResponse) => {
-          this.errorMessage = "Some error occured!";
+        (errorMessage: string) => {
+          this.errorMessage = errorMessage;
         }
       );
   }
