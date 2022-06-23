@@ -1,13 +1,16 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { throwError } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { Subject, throwError } from "rxjs";
+import { catchError, tap } from "rxjs/operators";
 import { AuthInformation } from "./interfaces/auth-information.interface";
 import { AuthResponseData } from "./interfaces/auth-response-data.interface";
+import { User } from "./user.model";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
   private apiKey = "AIzaSyDnviF4x-IlcbG58PvR0OURkCvse15I_ok";
+  public user: User;
+  public userSubject = new Subject<User>();
 
   constructor(private http: HttpClient) {}
 
@@ -26,7 +29,25 @@ export class AuthService {
         ...authInfo,
         returnSecureToken: true,
       })
-      .pipe(catchError(this.errorHandler));
+      .pipe(
+        catchError(this.errorHandler),
+        tap(this.handleSigninSuccessResponse.bind(this))
+      );
+  }
+
+  private handleSigninSuccessResponse(response: AuthResponseData) {
+    const tokenExpirationMicroTime = new Date().getTime() + +response.expiresIn * 1000;
+    const expirationDate = new Date(tokenExpirationMicroTime);
+    this.user = new User(
+      response.email,
+      response.localId,
+      response.idToken,
+      expirationDate
+    );
+
+    this.userSubject.next(this.user);
+    console.log(this.user);
+    
   }
 
   private errorHandler(errorResponse: HttpErrorResponse) {

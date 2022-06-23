@@ -46,7 +46,6 @@ export class AuthComponent {
       )
       .subscribe(
         (response: AuthResponseData) => {
-          console.log(response);
           form.reset();
         },
         (errorMessage: string) => {
