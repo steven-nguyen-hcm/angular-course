@@ -10,9 +10,13 @@ import { User } from "./user.model";
 export class AuthService {
   private apiKey = "AIzaSyDnviF4x-IlcbG58PvR0OURkCvse15I_ok";
   public user: User;
-  public userSubject = new Subject<User>();
+  public $userSubject = new Subject<User>();
 
   constructor(private http: HttpClient) {}
+
+  isAuthenticated() {
+    return !!this.user;
+  }
 
   signup(authInfo: AuthInformation) {
     return this.http
@@ -35,6 +39,11 @@ export class AuthService {
       );
   }
 
+  signout() {
+    this.user = null;
+    this.$userSubject.next(this.user);
+  }
+
   private handleSigninSuccessResponse(response: AuthResponseData) {
     const tokenExpirationMicroTime = new Date().getTime() + +response.expiresIn * 1000;
     const expirationDate = new Date(tokenExpirationMicroTime);
@@ -45,7 +54,7 @@ export class AuthService {
       expirationDate
     );
 
-    this.userSubject.next(this.user);
+    this.$userSubject.next(this.user);
     console.log(this.user);
     
   }
