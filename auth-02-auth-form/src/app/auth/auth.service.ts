@@ -12,6 +12,7 @@ export class AuthService {
   private apiKey = "AIzaSyDnviF4x-IlcbG58PvR0OURkCvse15I_ok";
   public user: User;
   public $userSubject = new BehaviorSubject<User>(null);
+  private tokenExpirationDurationTimeout: any;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -32,36 +33,49 @@ export class AuthService {
       })
       .pipe(
         catchError(this.apiResponseErrorHandler),
-        tap(this.handleSigninWithResponseData.bind(this))
+        tap(this.handleSigninWithApiResponseData.bind(this))
       );
   }
 
   signout() {
     this.$userSubject.next(null);
-    this.deleteUserAuthResponseData();
+    this.deleteUserFromLocalStorage();
     this.router.navigate(["/auth"]);
+    clearTimeout(this.tokenExpirationDurationTimeout);
   }
 
   autoLogin() {
-    const userAuthDataFromLocalStorage = this.loadStoredUserAuthData();
-    if (!userAuthDataFromLocalStorage) {
+    this.handleSigninWithLocalStorageData();
+  }
+
+  private setAutoSignout(user: User) {
+    const tokenRemainingTime =
+      user.tokenExpirationDate.getTime() - new Date().getTime();
+      
+    console.log("Auto logout in: " + Math.round(tokenRemainingTime / 1000) + " seconds.");
+
+    this.tokenExpirationDurationTimeout = setTimeout(() => {
+      this.signout();
+    }, tokenRemainingTime);
+  }
+
+  private handleSigninWithApiResponseData(authData: AuthResponseData) {
+    const user: User = this.getUserModel(authData);
+    this.$userSubject.next(user);
+    this.storeUserToLocalStorage(user);
+    this.setAutoSignout(user);
+  }
+
+  private handleSigninWithLocalStorageData() {
+    const user = this.loadUserFromLocalStorage();
+    if (!user) {
       return;
     }
-
-    this.setupUserGlobally(userAuthDataFromLocalStorage);
-  }
-
-  private handleSigninWithResponseData(authData: AuthResponseData) {
-    this.storeUserAuthResponseData(authData);
-    this.setupUserGlobally(authData);
-  }
-
-  private setupUserGlobally(authData: AuthResponseData): void {
-    const user: User = this.getUserData(authData);
     this.$userSubject.next(user);
+    this.setAutoSignout(user);
   }
 
-  private getUserData(userData: AuthResponseData): User {
+  private getUserModel(userData: AuthResponseData): User {
     const tokenExpirationMicroTime =
       new Date().getTime() + +userData.expiresIn * 1000;
     const expirationDate = new Date(tokenExpirationMicroTime);
@@ -73,17 +87,25 @@ export class AuthService {
     );
   }
 
-  private storeUserAuthResponseData(authData: AuthResponseData) {
-    localStorage.setItem("userAuthData", JSON.stringify(authData));
+  private storeUserToLocalStorage(user: User) {
+    localStorage.setItem("userAuthData", JSON.stringify(user));
   }
 
-  private deleteUserAuthResponseData() {
+  private deleteUserFromLocalStorage() {
     localStorage.removeItem("userAuthData");
   }
 
-  private loadStoredUserAuthData(): AuthResponseData | null {
+  private loadUserFromLocalStorage(): User | null {
     const userAuthDataFromLocalStorage = localStorage.getItem("userAuthData");
-    return JSON.parse(userAuthDataFromLocalStorage) as AuthResponseData;
+
+    if (!userAuthDataFromLocalStorage) {
+      return;
+    }
+    const { email, id, _token, _tokenExpirationDate } = JSON.parse(
+      userAuthDataFromLocalStorage
+    );
+
+    return new User(email, id, _token, new Date(_tokenExpirationDate));
   }
 
   private apiResponseErrorHandler(errorResponse: HttpErrorResponse) {

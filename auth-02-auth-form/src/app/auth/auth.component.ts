@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { NgForm } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { AuthService } from "./auth.service";
@@ -10,14 +11,19 @@ import { AuthResponseData } from "./interfaces/auth-response-data.interface";
   selector: "app-auth",
   templateUrl: "./auth.component.html",
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   isLoginMode = true;
   isLoading = false;
   errorMessage: string = null;
 
-  constructor(private authService: AuthService) {
-    console.log('Auth');
-    
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.authService.$userSubject.subscribe(user => {
+      if (!!user) {
+        this.router.navigate(['/recipes']);
+      }
+    })
   }
 
   onSwitchMode() {
