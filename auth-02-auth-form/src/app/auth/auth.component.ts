@@ -15,7 +15,10 @@ export class AuthComponent {
   isLoading = false;
   errorMessage: string = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    console.log('Auth');
+    
+  }
 
   onSwitchMode() {
     this.isLoginMode = !this.isLoginMode;

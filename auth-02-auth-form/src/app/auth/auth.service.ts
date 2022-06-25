@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
 import { BehaviorSubject, Subject, throwError } from "rxjs";
 import { catchError, tap } from "rxjs/operators";
 import { AuthInformation } from "./interfaces/auth-information.interface";
@@ -12,11 +13,7 @@ export class AuthService {
   public user: User;
   public $userSubject = new BehaviorSubject<User>(null);
 
-  constructor(private http: HttpClient) {}
-
-  isAuthenticated() {
-    return !!this.user;
-  }
+  constructor(private http: HttpClient, private router: Router) {}
 
   signup(authInfo: AuthInformation) {
     return this.http
@@ -24,7 +21,7 @@ export class AuthService {
         ...authInfo,
         returnSecureToken: true,
       })
-      .pipe(catchError(this.errorHandler));
+      .pipe(catchError(this.apiResponseErrorHandler));
   }
 
   signin(authInfo: AuthInformation) {
@@ -34,32 +31,62 @@ export class AuthService {
         returnSecureToken: true,
       })
       .pipe(
-        catchError(this.errorHandler),
-        tap(this.handleSigninSuccessResponse.bind(this))
+        catchError(this.apiResponseErrorHandler),
+        tap(this.handleSigninWithResponseData.bind(this))
       );
   }
 
   signout() {
-    this.user = null;
-    this.$userSubject.next(this.user);
+    this.$userSubject.next(null);
+    this.deleteUserAuthResponseData();
+    this.router.navigate(["/auth"]);
   }
 
-  private handleSigninSuccessResponse(response: AuthResponseData) {
-    const tokenExpirationMicroTime = new Date().getTime() + +response.expiresIn * 1000;
+  autoLogin() {
+    const userAuthDataFromLocalStorage = this.loadStoredUserAuthData();
+    if (!userAuthDataFromLocalStorage) {
+      return;
+    }
+
+    this.setupUserGlobally(userAuthDataFromLocalStorage);
+  }
+
+  private handleSigninWithResponseData(authData: AuthResponseData) {
+    this.storeUserAuthResponseData(authData);
+    this.setupUserGlobally(authData);
+  }
+
+  private setupUserGlobally(authData: AuthResponseData): void {
+    const user: User = this.getUserData(authData);
+    this.$userSubject.next(user);
+  }
+
+  private getUserData(userData: AuthResponseData): User {
+    const tokenExpirationMicroTime =
+      new Date().getTime() + +userData.expiresIn * 1000;
     const expirationDate = new Date(tokenExpirationMicroTime);
-    this.user = new User(
-      response.email,
-      response.localId,
-      response.idToken,
+    return new User(
+      userData.email,
+      userData.localId,
+      userData.idToken,
       expirationDate
     );
-
-    this.$userSubject.next(this.user);
-    console.log(this.user);
-    
   }
 
-  private errorHandler(errorResponse: HttpErrorResponse) {
+  private storeUserAuthResponseData(authData: AuthResponseData) {
+    localStorage.setItem("userAuthData", JSON.stringify(authData));
+  }
+
+  private deleteUserAuthResponseData() {
+    localStorage.removeItem("userAuthData");
+  }
+
+  private loadStoredUserAuthData(): AuthResponseData | null {
+    const userAuthDataFromLocalStorage = localStorage.getItem("userAuthData");
+    return JSON.parse(userAuthDataFromLocalStorage) as AuthResponseData;
+  }
+
+  private apiResponseErrorHandler(errorResponse: HttpErrorResponse) {
     let errorMessage: string = "Unknow error occured!";
 
     if (!errorResponse.error || !errorResponse.error.error) {
