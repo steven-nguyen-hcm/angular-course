@@ -3,11 +3,15 @@
     <app-loading-spinner></app-loading-spinner>
   </div>
 
-  <div class="col-xs-12 col-md-6 col-md-offset-3" *ngIf="errorMessage">
-    <div class="alert alert-danger">
+  <div class="col-xs-12 col-md-6 col-md-offset-3" >
+    <!-- <div class="alert alert-danger">
       {{ errorMessage }}
-    </div>
+    </div> -->
   </div>
+  <app-alert-box *ngIf="errorMessage"
+    (onCloseEventEmitter)="errorMessage = null"
+    >{{ errorMessage }}</app-alert-box
+  >
 
   <div class="col-xs-12 col-md-6 col-md-offset-3" [hidden]="isLoading">
     <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)">

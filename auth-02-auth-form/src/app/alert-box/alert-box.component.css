@@ -1,0 +1,23 @@
+.alert-box-backdrop {
+  background: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+}
+
+.alert-box {
+  position: fixed;
+  top: 30vh;
+  left: 30vw;
+  width: 40vw;
+  padding: 16px;
+  background-color: #fff;
+  z-index: 100;
+}
+
+.alert-box__close-btn {
+  float: right;
+}
