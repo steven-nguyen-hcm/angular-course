@@ -20,7 +20,8 @@ import { RecipeService } from "./recipes/recipe.service";
 import { AuthComponent } from "./auth/auth.component";
 import { LoadingSpinnerComponent } from "./shared/loading-spinner/loading-spinner.component";
 import { AuthInterceptorService } from "./auth/auth-interceptor.service";
-import { AlertBoxComponent } from "./alert-box/alert-box.component";
+import { PlaceHolderDirective } from "./shared/placeholder/placeholder.directive";
+import { AlertBoxComponent } from "./shared/alert-box/alert-box.component";
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { AlertBoxComponent } from "./alert-box/alert-box.component";
     RecipeEditComponent,
     AuthComponent,
     LoadingSpinnerComponent,
-    AlertBoxComponent
+    PlaceHolderDirective,
+    AlertBoxComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,6 +57,7 @@ import { AlertBoxComponent } from "./alert-box/alert-box.component";
       multi: true,
     },
   ],
+  entryComponents: [AlertBoxComponent],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

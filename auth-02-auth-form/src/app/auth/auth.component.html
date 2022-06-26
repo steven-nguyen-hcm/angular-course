@@ -8,10 +8,12 @@
       {{ errorMessage }}
     </div> -->
   </div>
-  <app-alert-box *ngIf="errorMessage"
+  <!-- <app-alert-box *ngIf="errorMessage"
     (onCloseEventEmitter)="errorMessage = null"
     >{{ errorMessage }}</app-alert-box
-  >
+  > -->
+
+  <ng-template appPlaceholder></ng-template>
 
   <div class="col-xs-12 col-md-6 col-md-offset-3" [hidden]="isLoading">
     <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)">

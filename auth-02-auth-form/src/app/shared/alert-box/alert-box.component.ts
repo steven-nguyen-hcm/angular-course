@@ -6,9 +6,8 @@ import { Component, EventEmitter, Output } from "@angular/core";
   styleUrls: ["./alert-box.component.css"],
 })
 export class AlertBoxComponent {
-  @Output() onCloseEventEmitter: EventEmitter<void> = new EventEmitter<void>();
-
-  onClose() {
-    this.onCloseEventEmitter.emit();
+  public message: string;
+  public onClose() {
+    console.info('This method is expected to be re-declared by the Component Referece instance');
   }
 }
