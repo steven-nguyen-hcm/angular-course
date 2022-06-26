@@ -1,19 +1,20 @@
 import {
+  HttpErrorResponse,
   HttpEvent,
-  HttpEventType,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
 } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { exhaustMap, take, tap } from "rxjs/operators";
+import { Router } from "@angular/router";
+import { Observable, throwError } from "rxjs";
+import { catchError, exhaustMap, take, tap } from "rxjs/operators";
 import { AuthService } from "./auth.service";
 import { User } from "./user.model";
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   intercept(
     req: HttpRequest<any>,
@@ -32,13 +33,22 @@ export class AuthInterceptorService implements HttpInterceptor {
         });
         return next.handle(modifiedReq);
       }),
-      tap((event: any) => {
-          console.log(event);
-
-        // if (event.type === HttpEventType.Response) {
-        //   console.log(event);
-        // }
-      })
+      // catchError(this.handleErrorResponse.bind(this))
     );
+  }
+
+  private handleErrorResponse(err: any) {
+    if (err instanceof HttpErrorResponse) {
+      return this.handleHttpErrorByStatus(err.status);
+    }
+  }
+
+  private handleHttpErrorByStatus(errStatus: number) {
+    switch (errStatus) {
+      case 401:
+        return this.router.navigate(["/auth"]);
+      default:
+        return throwError("Unknow Error");
+    }
   }
 }
