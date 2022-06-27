@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import { throwError, BehaviorSubject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 import { User } from './user.model';
 
@@ -143,18 +144,17 @@ export class AuthService {
     }
     return throwError(errorMessage);
   }
-  private apiKey = "AIzaSyDnviF4x-IlcbG58PvR0OURkCvse15I_ok";
 
   private getSignupUrl() {
     return (
       "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" +
-      this.apiKey
+      environment.firebaseAPIKey
     );
   }
   private getSigninUrl() {
     return (
       "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
-      this.apiKey
+      environment.firebaseAPIKey
     );
   }
 }
