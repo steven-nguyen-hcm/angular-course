@@ -27,16 +27,17 @@ export class AuthService {
   signup(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=' + environment.firebaseAPIKey,
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" +
+          environment.firebaseAPIKey,
         {
           email: email,
           password: password,
-          returnSecureToken: true
+          returnSecureToken: true,
         }
       )
       .pipe(
         catchError(this.handleError),
-        tap(resData => {
+        tap((resData) => {
           this.handleAuthentication(
             resData.email,
             resData.localId,
@@ -50,16 +51,17 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http
       .post<AuthResponseData>(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=' + environment.firebaseAPIKey,
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
+          environment.firebaseAPIKey,
         {
           email: email,
           password: password,
-          returnSecureToken: true
+          returnSecureToken: true,
         }
       )
       .pipe(
         catchError(this.handleError),
-        tap(resData => {
+        tap((resData) => {
           this.handleAuthentication(
             resData.email,
             resData.localId,
