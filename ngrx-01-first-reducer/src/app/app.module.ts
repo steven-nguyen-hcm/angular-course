@@ -8,8 +8,7 @@ import { AppComponent } from './app.component';
 import { CoreModule } from './core.module';
 import { HeaderComponent } from './header/header.component';
 import { SharedModule } from './shared/shared.module';
-import { shoppingListReducer } from "./shopping-list/store/shopping-list.reducer";
-import { testDataReducer } from './shopping-list/store/test-data.reducer';
+import { AppState, shoppingListReducer } from "./shopping-list/store/shopping-list.reducer";
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent],
@@ -20,7 +19,6 @@ import { testDataReducer } from './shopping-list/store/test-data.reducer';
     SharedModule,
     CoreModule,
     StoreModule.forRoot({
-      testData: testDataReducer,
       shoppingList: shoppingListReducer,
     }),
   ],
