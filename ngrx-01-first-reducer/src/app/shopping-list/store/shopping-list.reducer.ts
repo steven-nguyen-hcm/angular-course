@@ -8,19 +8,20 @@ export interface ShoppingListState {
 }
 
 export interface AppState {
-  shoppingList: ShoppingListState
+  shoppingList: ShoppingListState;
 }
 
 const initialState: ShoppingListState = {
   ingredients: [new Ingredient("Apples", 5), new Ingredient("Tomatoes", 10)],
   edittedIngredient: null,
-  edittedIngredientIndex: -1
+  edittedIngredientIndex: -1,
 };
 
 export const shoppingListReducer = (
   state = initialState,
   action: ShoppingListActions.ShoppingListActions
 ): ShoppingListState => {
+
   switch (action.type) {
     case ShoppingListActions.ADD_INGREDIENT:
       console.log("ShoppingListActions.ADD_INGREDIENT");
@@ -35,6 +36,7 @@ export const shoppingListReducer = (
         ...state,
         ingredients: [...state.ingredients, ...action.payload],
       };
+
     case ShoppingListActions.UPDATE_INGREDIENT:
       action = <ShoppingListActions.UpdateIngredient>action;
       const beforeUpdateIngredient = state.ingredients[action.payload.index];
@@ -61,6 +63,22 @@ export const shoppingListReducer = (
           return index !== action.payload;
         }),
       };
+
+    case ShoppingListActions.START_EDIT_INGREDIENT:
+      action = <ShoppingListActions.StartEditIngredient>action;
+
+      return {
+        ...state,
+        edittedIngredientIndex: action.payload,
+        edittedIngredient: { ...state.ingredients[action.payload] },
+      };
+
+    case ShoppingListActions.STOP_EDIT_INGREDIENT:
+      return {
+        ...state,
+        edittedIngredient: null,
+        edittedIngredientIndex: -1
+      }
 
     default:
       return state;
