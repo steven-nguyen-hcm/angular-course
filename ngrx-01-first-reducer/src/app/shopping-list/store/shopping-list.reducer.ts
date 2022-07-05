@@ -17,56 +17,56 @@ const initialState: ShoppingListState = {
   edittedIngredientIndex: -1,
 };
 
-export const shoppingListReducer = (
+export const shoppingListReducer = <T extends { payload: any }>(
   state = initialState,
-  action: ShoppingListActions.ShoppingListActions
+  action: ShoppingListActions.ShoppingListActions & T
 ): ShoppingListState => {
-
   switch (action.type) {
     case ShoppingListActions.ADD_INGREDIENT:
-      console.log("ShoppingListActions.ADD_INGREDIENT");
-      action = <ShoppingListActions.AddIngredian>action;
+      if (!(action instanceof ShoppingListActions.AddIngredian)) {
+        return state;
+      }
       return {
         ...state,
         ingredients: [...state.ingredients, action.payload],
       };
+
     case ShoppingListActions.ADD_MULTIPLE_INGREDIENTS:
-      action = <ShoppingListActions.AddMultipleIngredients>action;
       return {
         ...state,
         ingredients: [...state.ingredients, ...action.payload],
       };
 
     case ShoppingListActions.UPDATE_INGREDIENT:
-      action = <ShoppingListActions.UpdateIngredient>action;
-      const beforeUpdateIngredient = state.ingredients[action.payload.index];
+      const beforeUpdateIngredient =
+        state.ingredients[state.edittedIngredientIndex];
       const afterUpdatedIngredient = {
         ...beforeUpdateIngredient,
-        ...action.payload.ingredient,
+        ...action.payload,
       };
 
       const allCloneIngredients = [...state.ingredients];
-      allCloneIngredients[action.payload.index] = afterUpdatedIngredient;
+      allCloneIngredients[state.edittedIngredientIndex] =
+        afterUpdatedIngredient;
 
       return {
         ...state,
         ingredients: allCloneIngredients,
+        edittedIngredient: null,
+        edittedIngredientIndex: -1
       };
 
     case ShoppingListActions.DELETE_INGREDIENT:
-      action = <ShoppingListActions.DeleteIngredient>action;
-      console.log(action.payload, ...state.ingredients);
-
       return {
         ...state,
         ingredients: state.ingredients.filter((ingredient, index) => {
-          return index !== action.payload;
-        }),
+          return index !== state.edittedIngredientIndex;
+        })
       };
 
     case ShoppingListActions.START_EDIT_INGREDIENT:
-      action = <ShoppingListActions.StartEditIngredient>action;
-
+      const actionPayload = (<ShoppingListActions.StartEditIngredient>action)
+        .payload;
       return {
         ...state,
         edittedIngredientIndex: action.payload,
@@ -77,8 +77,8 @@ export const shoppingListReducer = (
       return {
         ...state,
         edittedIngredient: null,
-        edittedIngredientIndex: -1
-      }
+        edittedIngredientIndex: -1,
+      };
 
     default:
       return state;
