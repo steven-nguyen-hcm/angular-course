@@ -1,12 +1,12 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
-
-import { DataStorageService } from "../shared/data-storage.service";
 import { AuthService } from "../auth/auth.service";
-
-import * as fromApp from "../shared/store/app.reducer";
+import { DataStorageService } from "../shared/data-storage.service";
 import { Store } from "@ngrx/store";
+import { map } from "rxjs/operators";
+import { User } from "../auth/user.model";
 import * as fromAuth from "../auth/store/auth.reducer";
+import * as fromApp from "../shared/store/app.reducer";
 
 @Component({
   selector: "app-header",
@@ -25,15 +25,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.userSub = this.store
       .select("auth")
-      .subscribe((user: fromAuth.State) => {
+      .pipe(map((authState: fromAuth.State) => authState.user))
+      .subscribe((user: User) => {
         this.isAuthenticated = !!user;
       });
-
-    // this.userSub = this.authService.user.subscribe((user) => {
-    //   this.isAuthenticated = !!user;
-    //   console.log(!user);
-    //   console.log(!!user);
-    // });
   }
 
   onSaveData() {
