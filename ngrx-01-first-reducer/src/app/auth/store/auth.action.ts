@@ -1,13 +1,17 @@
 import { Action } from "@ngrx/store";
 
-export const LOGIN = "[AUTH] Login";
 export const LOGOUT = "[AUTH] Logout";
 export const LOGIN_START = "[AUTH] Login start";
-export const LOGIN_FAIL = "[AUTH] Login fail";
+export const SIGNUP_START = "[AUTH] Signup start";
+export const AUTHENTICATE_SUCCESS = "[AUTH] Auth success";
+export const AUTHENTICATE_FAIL = "[AUTH] Login fail";
+export const CLEAR_ERROR = '[AUTH] Clear error';
+export const AUTO_LOGIN = '[AUTH] Auto login';
+export const AUTO_LOGOUT = '[AUTH] Auto logout'
+export const DEFAULT = '[AUTH] Default';
 
-export class Login implements Action {
-  readonly type: string = LOGIN;
-
+export class AuthenticateSuccess implements Action {
+  readonly type: string = AUTHENTICATE_SUCCESS;
   constructor(
     public payload: {
       email: string;
@@ -16,6 +20,10 @@ export class Login implements Action {
       expirationDate: Date;
     }
   ) {}
+}
+
+export class Default implements Action {
+  readonly type: string = DEFAULT;
 }
 
 export class Logout implements Action {
@@ -27,9 +35,34 @@ export class LoginStart implements Action {
   constructor(public payload: { email: string; password: string }) {}
 }
 
-export class LoginFail implements Action {
-  readonly type: string = LOGIN_FAIL;
+export class AuthenticateFail implements Action {
+  readonly type: string = AUTHENTICATE_FAIL;
   constructor(public payload: string) {}
 }
 
-export type AuthActions = Login | Logout | LoginStart | LoginFail;
+export class SignupStart implements Action {
+  readonly type: string = SIGNUP_START;
+  constructor(public payload: { email: string; password: string }) {};
+}
+
+export class ClearError implements Action {
+  readonly type: string = CLEAR_ERROR;
+}
+
+export class AutoLogin implements Action {
+  readonly type: string = AUTO_LOGIN;
+}
+
+export class AutoLogout implements Action {
+  readonly type: string = AUTO_LOGOUT;
+  constructor(public payload: number) {}
+}
+
+export type AuthActions =
+  | AuthenticateSuccess
+  | Logout
+  | LoginStart
+  | AuthenticateFail
+  | ClearError
+  | AutoLogin
+  | AutoLogout;

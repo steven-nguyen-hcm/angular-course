@@ -1,3 +1,4 @@
+import { stagger } from "@angular/animations";
 import { User } from "../user.model";
 import * as AuthActions from "./auth.action";
 
@@ -17,9 +18,11 @@ export const authReducer = (
   state: State = initialState,
   action: AuthActions.AuthActions
 ): State => {
+  console.log(action.type);
+  
   switch (action.type) {
-    case AuthActions.LOGIN:
-      const { email, userId, token, expirationDate } = (<AuthActions.Login>(
+    case AuthActions.AUTHENTICATE_SUCCESS:
+      const { email, userId, token, expirationDate } = (<AuthActions.AuthenticateSuccess>(
         action
       )).payload;
       return {
@@ -38,13 +41,24 @@ export const authReducer = (
         authError: null,
         loading: true
       };
-    case AuthActions.LOGIN_FAIL:
+    case AuthActions.SIGNUP_START:
       return {
         ...state,
-        authError: (<AuthActions.LoginFail>action).payload,
+        loading: true,
+        authError: null
+      }
+    case AuthActions.AUTHENTICATE_FAIL:
+      return {
+        ...state,
+        authError: (<AuthActions.AuthenticateFail>action).payload,
         user: null,
         loading: false
       };
+    case AuthActions.CLEAR_ERROR:
+      return {
+        ...state,
+        authError: null
+      }
     default:
       return state;
   }
