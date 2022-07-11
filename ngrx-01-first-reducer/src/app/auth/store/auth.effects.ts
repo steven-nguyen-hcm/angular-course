@@ -141,7 +141,6 @@ export class AuthEffects {
       } = JSON.parse(localStorage.getItem("userData"));
 
       if (!userData) {
-        console.log("no user data");
         return new AuthActions.Default();
       }
 
@@ -160,6 +159,8 @@ export class AuthEffects {
           expirationDate: new Date(userData._tokenExpirationDate),
         });
       }
+
+      return new AuthActions.Default();
     }),
     take(1)
   );

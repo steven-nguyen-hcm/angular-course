@@ -10,6 +10,9 @@ import { CoreModule } from "./core.module";
 import { HeaderComponent } from "./header/header.component";
 import { SharedModule } from "./shared/shared.module";
 import { appReducer } from "./shared/store/app.reducer";
+import { environment } from "../environments/environment";
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
 @NgModule({
   declarations: [AppComponent, HeaderComponent],
@@ -21,6 +24,8 @@ import { appReducer } from "./shared/store/app.reducer";
     CoreModule,
     StoreModule.forRoot(appReducer),
     EffectsModule.forRoot([AuthEffects]),
+    StoreDevtoolsModule.instrument({ logOnly: environment.production }),
+    StoreRouterConnectingModule.forRoot(),
   ],
   bootstrap: [AppComponent],
   // providers: [LoggingService]
