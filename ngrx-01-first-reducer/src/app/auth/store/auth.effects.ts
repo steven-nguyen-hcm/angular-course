@@ -9,8 +9,7 @@ import {
   map,
   switchMap,
   take,
-  tap,
-  timeout,
+  tap
 } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { User } from "../user.model";
