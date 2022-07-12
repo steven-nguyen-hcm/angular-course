@@ -17,9 +17,7 @@ const initialState: State = {
 export const authReducer = (
   state: State = initialState,
   action: AuthActions.AuthActions
-): State => {
-  console.log(action.type);
-  
+): State => {  
   switch (action.type) {
     case AuthActions.AUTHENTICATE_SUCCESS:
       const { email, userId, token, expirationDate } = (<AuthActions.AuthenticateSuccess>(

@@ -8,7 +8,7 @@ import { RecipeService } from "../recipe.service";
 
 import * as fromApp from "../../shared/store/app.reducer";
 import * as fromRecipe from "../store/recipes.reducer";
-import { map } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
 
 @Component({
   selector: "app-recipe-list",
@@ -35,15 +35,9 @@ export class RecipeListComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((recipes: Recipe[]) => {
+        console.log('component list subscribe');
         this.recipes = recipes;
       });
-    // this.subscription = this.recipeService.recipesChanged
-    //   .subscribe(
-    //     (recipes: Recipe[]) => {
-    //       this.recipes = recipes;
-    //     }
-    //   );
-    // this.recipes = this.recipeService.getRecipes();
   }
 
   onNewRecipe() {
