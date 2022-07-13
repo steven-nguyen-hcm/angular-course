@@ -1,13 +1,13 @@
 import { Component, OnInit } from "@angular/core";
+import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Params, Router } from "@angular/router";
-import { FormGroup, FormControl, FormArray, Validators } from "@angular/forms";
-
-import { RecipeService } from "../recipe.service";
 import { Store } from "@ngrx/store";
-import { AppState } from "src/app/shared/store/app.reducer";
-import * as fromRecipe from "../store/recipes.reducer";
-import { Recipe } from "../recipe.model";
 import { map } from "rxjs/operators";
+import { AppState } from "src/app/shared/store/app.reducer";
+import { Recipe } from "../recipe.model";
+import * as RecipeActions from "../store/recipes.action";
+import * as fromRecipe from "../store/recipes.reducer";
+
 
 @Component({
   selector: "app-recipe-edit",
@@ -25,7 +25,6 @@ export class RecipeEditComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private recipeService: RecipeService,
     private router: Router,
     private store: Store<AppState>
   ) {}
@@ -39,15 +38,15 @@ export class RecipeEditComponent implements OnInit {
   }
 
   onSubmit() {
-    // const newRecipe = new Recipe(
-    //   this.recipeForm.value['name'],
-    //   this.recipeForm.value['description'],
-    //   this.recipeForm.value['imagePath'],
-    //   this.recipeForm.value['ingredients']);
     if (this.editMode) {
-      this.recipeService.updateRecipe(this.id, this.recipeForm.value);
+      this.store.dispatch(
+        new RecipeActions.UpdateRecipe({
+          id: this.id,
+          recipe: this.recipeForm.value,
+        })
+      );
     } else {
-      this.recipeService.addRecipe(this.recipeForm.value);
+      this.store.dispatch(new RecipeActions.AddRecipe(this.recipeForm.value));
     }
     this.onCancel();
   }
@@ -81,9 +80,11 @@ export class RecipeEditComponent implements OnInit {
     if (this.editMode) {
       this.store
         .select("recipe")
-        .pipe(map((state: fromRecipe.State) => {
-          return state.recipes[this.id];
-        }))
+        .pipe(
+          map((state: fromRecipe.State) => {
+            return state.recipes[this.id];
+          })
+        )
         .subscribe((recipe: Recipe) => {
           recipeName = recipe.name;
           recipeImagePath = recipe.imagePath;

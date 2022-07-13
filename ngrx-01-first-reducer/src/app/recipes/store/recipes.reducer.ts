@@ -14,16 +14,47 @@ export function recipesReducer(
   action: RecipeActions.RecipeActions & { payload: any }
 ): State {
   switch (action.type) {
-    case RecipeActions.SET_RECIPES:
+    case RecipeActions.SET_RECIPES: {
       return {
         ...state,
         recipes: action.payload,
       };
-    case RecipeActions.FETCH_RECIPES:
+    }
+    case RecipeActions.DELETE_RECIPE: {
       return {
-        ...state
-      }
-    default:
+        ...state,
+        recipes: state.recipes.filter((recipe: Recipe, index) => {
+          return index !== (<RecipeActions.DeleteRecipe>action).payload;
+        }),
+      };
+    }
+    case RecipeActions.UPDATE_RECIPE: {
+      const payload = (<RecipeActions.UpdateRecipe>action).payload;
+      const recipeChanges = payload.recipe;
+      const currentRecipe = { ...state[payload.id] };
+
+      const recipesSnapshot = [...state.recipes];
+      recipesSnapshot[payload.id] = {
+        ...currentRecipe,
+        ...recipeChanges,
+      };
+
+      return {
+        ...state,
+        recipes: recipesSnapshot,
+      };
+    }
+    case RecipeActions.ADD_RECIPE: {
+      const newRecipe = (<RecipeActions.AddRecipe>action).payload;
+      const recipesSnapshot = [...state.recipes];
+      recipesSnapshot.push(newRecipe);
+      return {
+        ...state,
+        recipes: recipesSnapshot,
+      };
+    }
+    default: {
       return state;
+    }
   }
 }
