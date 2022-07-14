@@ -6,7 +6,6 @@ import * as AuthActions from '../auth/store/auth.action';
 import * as fromAuth from "../auth/store/auth.reducer";
 import { User } from "../auth/user.model";
 import * as RecipeActions from '../recipes/store/recipes.action';
-import { DataStorageService } from "../shared/data-storage.service";
 import * as fromApp from "../shared/store/app.reducer";
 
 @Component({
@@ -18,7 +17,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private userSub: Subscription;
 
   constructor(
-    private dataStorageService: DataStorageService,
     private store: Store<fromApp.AppState>
   ) {}
 

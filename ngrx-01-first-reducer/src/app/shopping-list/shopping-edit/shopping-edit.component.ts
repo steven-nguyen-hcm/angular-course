@@ -2,11 +2,9 @@ import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
-
+import { AppState } from "src/app/shared/store/app.reducer";
 import { Ingredient } from "../../shared/ingredient.model";
 import * as ShoppingListActions from "../store/shopping-list.action";
-import * as fromShoppingList from "../store/shopping-list.reducer";
-import * as fromApp from '../../shared/store/app.reducer';
 
 @Component({
   selector: "app-shopping-edit",
@@ -16,17 +14,17 @@ import * as fromApp from '../../shared/store/app.reducer';
 export class ShoppingEditComponent implements OnInit, OnDestroy {
   @ViewChild("f", { static: false }) slForm: NgForm;
   subscription: Subscription;
-  editMode = false;
+  isEditting = false;
   editedItem: Ingredient;
 
-  constructor(private store: Store<fromApp.AppState>) {}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit() {
     this.subscription = this.store
       .select("shoppingList")
-      .subscribe((state: fromApp.AppState['shoppingList']) => {
+      .subscribe((state: AppState['shoppingList']) => {
         if (!!state.edittedIngredient) {
-          this.editMode = true;
+          this.isEditting = true;
           this.editedItem = state.edittedIngredient;
           this.slForm.setValue({
             name: this.editedItem.name,
@@ -39,20 +37,20 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   onSubmit(form: NgForm) {
     const value = form.value;
     const newIngredient = new Ingredient(value.name, value.amount);
-    if (this.editMode) {
+    if (this.isEditting) {
       this.store.dispatch(
         new ShoppingListActions.UpdateIngredient(newIngredient)
       );
     } else {
       this.store.dispatch(new ShoppingListActions.AddIngredian(newIngredient));
     }
-    this.editMode = false;
+    this.isEditting = false;
     form.reset();
   }
 
   onClear() {
     this.slForm.reset();
-    this.editMode = false;
+    this.isEditting = false;
     this.store.dispatch(new ShoppingListActions.StopEditIngredient());
   }
 
