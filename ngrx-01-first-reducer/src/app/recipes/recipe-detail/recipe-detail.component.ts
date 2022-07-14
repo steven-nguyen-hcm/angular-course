@@ -37,8 +37,6 @@ export class RecipeDetailComponent implements OnInit {
         })
       )
       .subscribe((recipe: Recipe) => {
-        // this.id = +params["id"];
-        // this.recipe = this.recipeService.getRecipe(this.id);
         this.recipe = recipe;
       });
   }

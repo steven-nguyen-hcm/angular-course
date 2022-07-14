@@ -24,10 +24,7 @@ export class RecipeEffect {
             return of(null);
           })
         );
-    }),
-    map((recipes) => {
-      return (recipes || []).map((recipe) => {
-        return {
+    }),RecipeActions
           ...recipe,
           ingredients: recipe.ingredients || [],
         };
