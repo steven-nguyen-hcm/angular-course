@@ -49,7 +49,12 @@ export class RecipeEffect {
       )
     ),
     switchMap(([action, recipes]: [RecipeActions.StoreRecipe, Recipe[]]) => {
-      return of()
+      console.log('store recipes');
+      
+      return this.http.put(
+        "https://ng-course-recipe-book-408b7-default-rtdb.asia-southeast1.firebasedatabase.app/recipes.json",
+        recipes
+      );
     })
   );
 
